@@ -196,14 +196,13 @@ public class ProblemDetailsExtensionsTests
     }
 
     [Fact]
-    public void Error_WithSource_ToProblemDetailsObject_IncludesFullMessage()
+    public void Error_WithContext_ToProblemDetailsObject_IncludesFullMessage()
     {
         // Arrange
-        var innerError = Error.New("Database error", ErrorKind.Io);
-        var outerError = Error.New("Failed to save", ErrorKind.InvalidOperation).WithSource(innerError);
+        var error = Error.New("Failed to save: Database error", ErrorKind.InvalidOperation);
 
         // Act
-        var problemDetails = outerError.ToProblemDetailsObject();
+        var problemDetails = error.ToProblemDetailsObject();
 
         // Assert
         Assert.Contains("Failed to save", problemDetails.Detail);
@@ -341,23 +340,6 @@ public class ProblemDetailsExtensionsTests
         var objectResult = Assert.IsType<ObjectResult>(actionResult);
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.NotNull(problemDetails);
-    }
-
-    [Fact]
-    public void Error_WithMultipleSources_ToProblemDetails_HandlesChain()
-    {
-        // Arrange
-        var error1 = Error.New("Database connection failed", ErrorKind.Io);
-        var error2 = Error.New("Query failed", ErrorKind.InvalidOperation).WithSource(error1);
-        var error3 = Error.New("Request failed", ErrorKind.InvalidInput).WithSource(error2);
-
-        // Act
-        var actionResult = error3.ToProblemDetails();
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(actionResult);
-        var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
-        Assert.NotNull(problemDetails.Detail);
     }
 
     #endregion

@@ -152,7 +152,7 @@ public class OptionModelBinderTests
             ActionContext = actionContext,
             ModelMetadata = modelMetadata,
             ModelName = "test",
-            ValueProvider = new SimpleValueProvider(),
+            ValueProvider = new CompositeValueProvider(),
             ModelState = new ModelStateDictionary()
         };
 

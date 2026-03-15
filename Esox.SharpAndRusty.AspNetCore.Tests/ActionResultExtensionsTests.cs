@@ -13,7 +13,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToActionResult_ReturnsOkObjectResult()
     {
         // Arrange
-        var result = new Result<string, string>("success");
+        var result = Result<string, string>.Ok("success");
 
         // Act
         var actionResult = result.ToActionResult();
@@ -28,7 +28,7 @@ public class ActionResultExtensionsTests
     public void Result_Err_ToActionResult_ReturnsObjectResultWithDefaultStatusCode()
     {
         // Arrange
-        var result = Result<string, string>.FromErr("error");
+        var result = Result<string, string>.Err("error");
 
         // Act
         var actionResult = result.ToActionResult();
@@ -43,7 +43,7 @@ public class ActionResultExtensionsTests
     public void Result_Err_ToActionResult_ReturnsObjectResultWithCustomStatusCode()
     {
         // Arrange
-        var result = Result<string, string>.FromErr("error");
+        var result = Result<string, string>.Err("error");
 
         // Act
         var actionResult = result.ToActionResult(StatusCodes.Status500InternalServerError);
@@ -59,7 +59,7 @@ public class ActionResultExtensionsTests
     {
         // Arrange
         var error = Error.New("Resource not found", ErrorKind.NotFound);
-        var result = Result<string, Error>.FromErr(error);
+        var result = Result<string, Error>.Err(error);
 
         // Act
         var actionResult = result.ToActionResult();
@@ -79,7 +79,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToCreatedResult_ReturnsCreatedResult()
     {
         // Arrange
-        var result = new Result<string, string>("created");
+        var result = Result<string, string>.Ok("created");
 
         // Act
         var actionResult = result.ToCreatedResult("/api/resource/1");
@@ -94,7 +94,7 @@ public class ActionResultExtensionsTests
     public void Result_Err_ToCreatedResult_ReturnsObjectResult()
     {
         // Arrange
-        var result = Result<string, string>.FromErr("error");
+        var result = Result<string, string>.Err("error");
 
         // Act
         var actionResult = result.ToCreatedResult("/api/resource/1");
@@ -109,7 +109,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToCreatedResult_WithLocationSelector_ReturnsCreatedResult()
     {
         // Arrange
-        var result = new Result<int, Error>(42);
+        var result = Result<int, Error>.Ok(42);
 
         // Act
         var actionResult = result.ToCreatedResult(id => $"/api/resource/{id}");
@@ -128,7 +128,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToNoContentResult_ReturnsNoContentResult()
     {
         // Arrange
-        var result = new Result<Unit, string>(Unit.Value);
+        var result = Result<Unit, string>.Ok(Unit.Value);
 
         // Act
         var actionResult = result.ToNoContentResult();
@@ -141,7 +141,7 @@ public class ActionResultExtensionsTests
     public void Result_Err_ToNoContentResult_ReturnsObjectResult()
     {
         // Arrange
-        var result = Result<Unit, string>.FromErr("error");
+        var result = Result<Unit, string>.Err("error");
 
         // Act
         var actionResult = result.ToNoContentResult();
@@ -157,7 +157,7 @@ public class ActionResultExtensionsTests
     {
         // Arrange
         var error = Error.New("Invalid data", ErrorKind.InvalidInput);
-        var result = Result<Unit, Error>.FromErr(error);
+        var result = Result<Unit, Error>.Err(error);
 
         // Act
         var actionResult = result.ToNoContentResult();
@@ -175,7 +175,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToAcceptedResult_WithLocation_ReturnsAcceptedResult()
     {
         // Arrange
-        var result = new Result<string, Error>("processing");
+        var result = Result<string, Error>.Ok("processing");
 
         // Act
         var actionResult = result.ToAcceptedResult("/api/status/123");
@@ -190,7 +190,7 @@ public class ActionResultExtensionsTests
     public void Result_Ok_ToAcceptedResult_WithoutLocation_ReturnsAcceptedResult()
     {
         // Arrange
-        var result = new Result<string, Error>("processing");
+        var result = Result<string, Error>.Ok("processing");
 
         // Act
         var actionResult = result.ToAcceptedResult();
@@ -206,7 +206,7 @@ public class ActionResultExtensionsTests
     {
         // Arrange
         var error = Error.New("Invalid request", ErrorKind.InvalidInput);
-        var result = Result<string, Error>.FromErr(error);
+        var result = Result<string, Error>.Err(error);
 
         // Act
         var actionResult = result.ToAcceptedResult("/api/status/123");
@@ -380,7 +380,7 @@ public class ActionResultExtensionsTests
     public void Validation_Valid_ToActionResult_ReturnsOkObjectResult()
     {
         // Arrange
-        var validation = new Validation<string, string>("success");
+        var validation = Validation<string, string>.Valid("success");
 
         // Act
         var actionResult = validation.ToActionResult();
@@ -394,7 +394,7 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToActionResult_ReturnsBadRequestWithErrors()
     {
         // Arrange
-        var validation = Validation<string, string>.FromErrors("error1", "error2");
+        var validation = Validation<string, string>.Invalid(new[] { "error1", "error2" });
 
         // Act
         var actionResult = validation.ToActionResult();
@@ -411,7 +411,7 @@ public class ActionResultExtensionsTests
         // Arrange
         var error1 = Error.New("Field1 invalid", ErrorKind.InvalidInput);
         var error2 = Error.New("Field2 invalid", ErrorKind.InvalidInput);
-        var validation = Validation<string, Error>.FromErrors(error1, error2);
+        var validation = Validation<string, Error>.Invalid(new[] { error1, error2 });
 
         // Act
         var actionResult = validation.ToActionResult();
@@ -428,7 +428,7 @@ public class ActionResultExtensionsTests
     public void Validation_Valid_ToValidationResult_ReturnsNull()
     {
         // Arrange
-        var validation = new Validation<object, string>(new object());
+        var validation = Validation<object, string>.Valid(new object());
 
         // Act
         var actionResult = validation.ToValidationResult(
@@ -444,7 +444,7 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToValidationResult_ReturnsValidationProblemDetails()
     {
         // Arrange
-        var validation = Validation<object, string>.FromErrors("error1", "error2");
+        var validation = Validation<object, string>.Invalid(new[] { "error1", "error2" });
 
         // Act
         var actionResult = validation.ToValidationResult(
@@ -463,11 +463,12 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToValidationResult_GroupsByKey()
     {
         // Arrange
-        var validation = Validation<object, (string field, string message)>.FromErrors(
+        var validation = Validation<object, (string field, string message)>.Invalid(new[]
+        {
             ("email", "Invalid email"),
             ("password", "Too short"),
             ("email", "Already exists")
-        );
+        });
 
         // Act
         var actionResult = validation.ToValidationResult(
@@ -493,7 +494,7 @@ public class ActionResultExtensionsTests
     {
         // Arrange
         var person = new Person { Name = "John", Age = 30 };
-        var result = new Result<Person, Error>(person);
+        var result = Result<Person, Error>.Ok(person);
 
         // Act
         var actionResult = result.ToActionResult();
