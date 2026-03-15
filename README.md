@@ -7,6 +7,7 @@
 
 ASP.NET Core integration for **Esox.SharpAndRusty** functional types (`Option`, `Result`, `Either`, `Validation`).
 
+
 ## Features
 
 - ✅ **Action Result Conversions** - Convert `Result`/`Option`/`Either`/`Validation` to `IActionResult`

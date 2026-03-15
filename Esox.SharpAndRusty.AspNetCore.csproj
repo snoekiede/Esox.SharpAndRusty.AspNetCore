@@ -6,6 +6,13 @@
     <Nullable>enable</Nullable>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>C:\temp\Esox.SharpAndRusty.AspNetCore.snk</AssemblyOriginatorKeyFile>
+    <Authors>Iede Snoek</Authors>
+    <Company>Esox Solutions</Company>
+    <Copyright>(c) 2026 by Esox Solutions</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore</RepositoryUrl>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +28,10 @@
   <ItemGroup>
     <PackageReference Include="Esox.SharpAndRusty" Version="1.5.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
