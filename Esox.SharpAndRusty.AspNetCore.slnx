@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Esox.SharpAndRusty.AspNetCore.csproj" />
+  <Project Path="Esox.SharpAndRusty.AspNetCore.Tests/Esox.SharpAndRusty.AspNetCore.Tests.csproj" />
 </Solution>
