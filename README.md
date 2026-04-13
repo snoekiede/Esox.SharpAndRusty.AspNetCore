@@ -1,22 +1,21 @@
 # Esox.SharpAndRusty.AspNetCore
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
-[![Tests](https://img.shields.io/badge/tests-411%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
+[![Tests](https://img.shields.io/badge/tests-513%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![.NET](https://img.shields.io/badge/.NET-8%20%7C%209%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 
 ASP.NET Core integration for **Esox.SharpAndRusty** functional types (`Option`, `Result`, `Either`, `Validation`).
 
-
 ## Features
 
-- ✅ **Action Result Conversions** - Convert `Result`/`Option`/`Either`/`Validation` to `IActionResult`
+- ✅ **Action Result Conversions** - Convert `Result`/`ExtendedResult`/`Option`/`Either`/`Validation` to `IActionResult`
 - ✅ **RFC 7807 ProblemDetails** - Automatic conversion of `Error` types to standardized problem details
 - ✅ **Model Binding** - Bind `Option<T>` from request parameters/body with full type support
 - ✅ **Global Error Handling** - Middleware for catching exceptions and converting to ProblemDetails
 - ✅ **Automatic Status Codes** - ErrorKind automatically maps to appropriate HTTP status codes
 - ✅ **Validation Integration** - `Validation<T, E>` converts to ValidationProblemDetails
-- ✅ **Comprehensive Testing** - 411 unit tests with 100% coverage across .NET 8, 9, and 10
+- ✅ **Comprehensive Testing** - 513 unit tests with 100% coverage across .NET 8, 9, and 10
 
 ## Why Use This Library?
 
@@ -230,6 +229,65 @@ public IActionResult Create([FromBody] CreateUserDto dto)
     return validation.ToValidationResult(
         keySelector: error => error.FieldName,
         messageSelector: error => error.Message
+    );
+}
+```
+
+### ExtendedResult<T, E> → IActionResult
+
+`ExtendedResult` provides the same functionality as `Result` with additional context capabilities:
+
+```csharp
+// Basic conversion with automatic status mapping
+[HttpGet("{id}")]
+public IActionResult Get(int id)
+{
+    var result = GetUserExtended(id); // ExtendedResult<User, Error>
+    return result.ToActionResult(); // 200 OK or appropriate error status
+}
+
+// Custom status code for generic errors
+[HttpPost]
+public IActionResult Create([FromBody] CreateUserDto dto)
+{
+    var result = CreateUserExtended(dto); // ExtendedResult<User, string>
+    return result.ToActionResult(statusCode: 422); // 422 on error
+}
+
+// Created result (201)
+[HttpPost]
+public IActionResult Create([FromBody] CreateUserDto dto)
+{
+    var result = CreateUserExtended(dto); // ExtendedResult<User, Error>
+    return result.ToCreatedResult(user => $"/api/users/{user.Id}");
+    // Returns 201 Created with Location header
+}
+
+// No content result (204)
+[HttpDelete("{id}")]
+public IActionResult Delete(int id)
+{
+    var result = DeleteUserExtended(id); // ExtendedResult<Unit, Error>
+    return result.ToNoContentResult(); // 204 No Content or error
+}
+
+// Accepted result (202)
+[HttpPost("batch")]
+public IActionResult BatchProcess([FromBody] BatchRequest request)
+{
+    var result = QueueBatchJobExtended(request); // ExtendedResult<JobId, Error>
+    return result.ToAcceptedResult($"/api/jobs/{result.Value.Id}");
+    // Returns 202 Accepted with Location
+}
+
+// Custom handlers for complete control
+[HttpPost("process")]
+public IActionResult Process([FromBody] ProcessRequest request)
+{
+    var result = ProcessDataExtended(request); // ExtendedResult<ProcessResult, Error>
+    return result.ToActionResult(
+        onSuccess: data => Ok(new { data, processed = DateTime.UtcNow }),
+        onFailure: error => error.ToProblemDetails()
     );
 }
 ```
@@ -890,7 +948,7 @@ This change provides:
 | Metric | Status |
 |--------|--------|
 | Build | ✅ Passing |
-| Tests | ✅ 411/411 passing |
+| Tests | ✅ 513/513 passing |
 | Vulnerabilities | ✅ 0 found |
 | Target Frameworks | .NET 8.0, 9.0, 10.0 |
 | Code Coverage | 100% |

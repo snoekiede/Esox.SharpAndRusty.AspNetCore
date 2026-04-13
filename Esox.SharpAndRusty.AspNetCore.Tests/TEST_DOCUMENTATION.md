@@ -1,12 +1,12 @@
 # Comprehensive Test Suite for Esox.SharpAndRusty.AspNetCore
 
-✅ **Current Status: All 411 tests passing on .NET 8, 9, and 10**
+✅ **Current Status: All 513 tests passing on .NET 8, 9, and 10**
 
 This document outlines the comprehensive unit tests for the Esox.SharpAndRusty.AspNetCore library.
 
 ## Test Coverage Summary
 
-The test suite includes **411 unit tests** covering all major components with 100% pass rate:
+The test suite includes **513 unit tests** covering all major components with 100% pass rate:
 
 ### 1. ActionResultExtensionsTests (40+ tests)
 Tests for converting functional types to ASP.NET Core `IActionResult`:
@@ -39,7 +39,65 @@ Tests for converting functional types to ASP.NET Core `IActionResult`:
 - `ToValidationResult()` with field mapping
 - `ToValidationResult()` with error grouping by key
 
-### 2. ProblemDetailsExtensionsTests (30+ tests)
+### 2. ActionExtendedResultExtensionsTests (102 tests)
+Comprehensive tests for ExtendedResult to ASP.NET Core `IActionResult` conversions:
+
+#### ExtendedResult<T, E> Basic Conversions (5 tests)
+- `ToActionResult()` with Ok and Err cases
+- `ToActionResult()` with custom status codes
+- `ToActionResult()` with Error type and automatic status mapping
+- Complex type serialization
+- Error to ProblemDetails mapping
+
+#### ExtendedResult ToCreatedResult (4 tests)
+- Created (201) responses with location URI
+- Location selector function usage
+- Error handling with ProblemDetails
+- Empty location handling
+
+#### ExtendedResult ToNoContentResult (4 tests)
+- NoContent (204) responses for Unit types
+- Custom status codes for errors
+- Error to ProblemDetails conversion
+- Edge case handling
+
+#### ExtendedResult ToAcceptedResult (3 tests)
+- Accepted (202) responses with location
+- Accepted without location
+- Error handling with ProblemDetails
+
+#### Custom Handlers (3 tests)
+- Success/failure callback functions
+- Complex transformations
+- Custom result creation patterns
+
+#### Error Kind Mapping (5 theory tests)
+- NotFound → 404
+- PermissionDenied → 403
+- InvalidInput → 400
+- Timeout → 408
+- AlreadyExists → 409
+
+#### Edge Cases and Validation (5 tests)
+- Null value handling
+- Empty string handling
+- Empty location handling
+- Nested error structures
+- Error chaining workflows
+
+#### Collections Tests (2 tests)
+- List handling and serialization
+- Empty collection handling
+
+#### Integration Tests (2 tests)
+- Error chaining scenarios
+- Multiple conversion patterns
+
+#### Type Inference Tests (2 tests)
+- Generic type inference verification
+- Helper method patterns
+
+### 3. ProblemDetailsExtensionsTests (30+ tests)
 Tests for converting Error types to RFC 7807 ProblemDetails:
 
 #### Error to ProblemDetails Conversion
@@ -69,7 +127,7 @@ Tests for converting Error types to RFC 7807 ProblemDetails:
 #### Extended Status Codes
 - Custom status code 499 (Client Closed Request)
 
-### 3. ModelBinding/OptionModelBinderTests (15+ tests)
+### 4. ModelBinding/OptionModelBinderTests (15+ tests)
 Tests for Option<T> model binding:
 
 #### OptionModelBinder Tests
@@ -87,7 +145,7 @@ Tests for Option<T> model binding:
 - `GetBinder()` with various generic types
 - Integration with model metadata provider
 
-### 4. Middleware/ResultMiddlewareTests (25+ tests)
+### 5. Middleware/ResultMiddlewareTests (25+ tests)
 Tests for global exception handling middleware:
 
 #### ResultMiddleware Tests
@@ -108,7 +166,7 @@ Tests for global exception handling middleware:
 - `Production()` static factory (excludes sensitive info, adds request ID metadata)
 - Custom metadata provider functionality
 
-### 5. ServiceCollectionExtensionsTests (20+ tests)
+### 6. ServiceCollectionExtensionsTests (20+ tests)
 Tests for service registration and middleware configuration:
 
 #### Service Collection Extensions
@@ -211,12 +269,12 @@ dotnet test --framework net10.0
 ## Test Results
 
 **Last Test Run:**
-- **Total Tests:** 411
-- **Passed:** 411 ✅
+- **Total Tests:** 513
+- **Passed:** 513 ✅
 - **Failed:** 0
 - **Skipped:** 0
 - **Frameworks:** .NET 8.0, 9.0, 10.0
-- **Duration:** ~350ms
+- **Duration:** ~275ms
 
 ## Code Coverage
 
@@ -238,6 +296,7 @@ Tests are organized by component:
 ```
 Esox.SharpAndRusty.AspNetCore.Tests/
 ├── ActionResultExtensionsTests.cs          # ~80 tests
+├── ActionExtendedResultExtensionsTests.cs  # 102 tests ⭐ NEW
 ├── ProblemDetailsExtensionsTests.cs        # ~120 tests
 ├── ServiceCollectionExtensionsTests.cs     # ~40 tests
 ├── SharpAndRustyOptionsTests.cs            # ~20 tests

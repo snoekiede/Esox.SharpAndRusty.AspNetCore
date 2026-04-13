@@ -1,7 +1,7 @@
 # Project Status - ✅ FULLY OPERATIONAL
 
 ## Current Status
-All compilation issues have been resolved! The project builds successfully and all 411 unit tests pass across .NET 8, 9, and 10.
+All compilation issues have been resolved! The project builds successfully and all 513 unit tests pass across .NET 8, 9, and 10.
 
 ## Recent Fixes
 
@@ -26,7 +26,7 @@ All compilation issues have been resolved! The project builds successfully and a
 - No vulnerable packages remain in the dependency tree
 
 ### ✅ Test Suite - FULLY PASSING
-- **411 unit tests** across 7 test classes
+- **513 unit tests** across 8 test classes
 - **100% pass rate** on .NET 8.0, 9.0, and 10.0
 - Zero compilation errors
 - Zero runtime errors
@@ -36,6 +36,7 @@ All compilation issues have been resolved! The project builds successfully and a
 | Test Class | Test Count | Status |
 |-----------|------------|--------|
 | ActionResultExtensionsTests | ~80 | ✅ All Passing |
+| ActionExtendedResultExtensionsTests | 102 | ✅ All Passing ⭐ NEW |
 | ProblemDetailsExtensionsTests | ~120 | ✅ All Passing |
 | ModelBinding.OptionModelBinderTests | ~40 | ✅ All Passing |
 | Middleware.ResultMiddlewareTests | ~60 | ✅ All Passing |
@@ -51,6 +52,12 @@ This library uses **Esox.SharpAndRusty v1.5.1**. Here are the correct API patter
 ```csharp
 var success = Result<string, string>.Ok("value");
 var failure = Result<string, string>.Err("error");
+```
+
+### ✅ ExtendedResult<T, E> Creation
+```csharp
+var success = ExtendedResult<string, string>.Ok("value");
+var failure = ExtendedResult<string, string>.Err("error");
 ```
 
 ### ✅ Option<T> Creation
@@ -96,7 +103,7 @@ dotnet list package --vulnerable --include-transitive
 ## Verification
 
 Last successful build: ✅  
-Last test run: ✅ 411 tests passed (0 failed, 0 skipped)  
+Last test run: ✅ 513 tests passed (0 failed, 0 skipped)  
 Vulnerabilities: ✅ None found
 
 ## Project Structure
@@ -105,6 +112,7 @@ Vulnerabilities: ✅ None found
 Esox.SharpAndRusty.AspNetCore/
 ├── Esox.SharpAndRusty.AspNetCore.csproj    # Main library project
 ├── ActionResultExtensions.cs               # Result/Option/Either → IActionResult
+├── ActionExtendedResultExtensions.cs       # ExtendedResult → IActionResult ⭐ NEW
 ├── ProblemDetailsExtensions.cs             # Error → ProblemDetails
 ├── ServiceCollectionExtensions.cs          # DI configuration
 ├── ModelBinding/
@@ -116,6 +124,7 @@ Esox.SharpAndRusty.AspNetCore/
 Esox.SharpAndRusty.AspNetCore.Tests/
 ├── Esox.SharpAndRusty.AspNetCore.Tests.csproj
 ├── ActionResultExtensionsTests.cs
+├── ActionExtendedResultExtensionsTests.cs  # ⭐ NEW - 102 tests
 ├── ProblemDetailsExtensionsTests.cs
 ├── ServiceCollectionExtensionsTests.cs
 ├── SharpAndRustyOptionsTests.cs
