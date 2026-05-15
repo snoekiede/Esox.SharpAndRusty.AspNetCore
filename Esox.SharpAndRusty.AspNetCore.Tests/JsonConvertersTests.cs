@@ -1,7 +1,5 @@
 using System.Text.Json;
-using Esox.SharpAndRusty.AspNetCore;
 using Esox.SharpAndRusty.Types;
-using Xunit;
 
 namespace Esox.SharpAndRusty.AspNetCore.Tests;
 
@@ -112,6 +110,37 @@ public class JsonConvertersTests
         // Assert
         var some = Assert.IsType<Option<string>.Some>(option);
         Assert.Equal("test value", some.Value);
+    }
+
+    [Fact]
+    public void Option_Deserialize_Null_Property_To_None()
+    {
+        // Arrange
+        var json = "{\"Name\":\"Test User\",\"Email\":null}";
+
+        // Act
+        var model = JsonSerializer.Deserialize<OptionContainer>(json, _options);
+
+        // Assert
+        Assert.NotNull(model);
+        Assert.Equal("Test User", model.Name);
+        Assert.IsType<Option<string>.None>(model.Email);
+    }
+
+    [Fact]
+    public void Option_Deserialize_Value_Property_To_Some()
+    {
+        // Arrange
+        var json = "{\"Name\":\"Test User\",\"Email\":\"test@example.com\"}";
+
+        // Act
+        var model = JsonSerializer.Deserialize<OptionContainer>(json, _options);
+
+        // Assert
+        Assert.NotNull(model);
+        Assert.Equal("Test User", model.Name);
+        var some = Assert.IsType<Option<string>.Some>(model.Email);
+        Assert.Equal("test@example.com", some.Value);
     }
 
     #endregion
@@ -257,7 +286,7 @@ public class JsonConvertersTests
         var response = new
         {
             Success = true,
-            Data = Result<User, string>.Ok(new User { Id = 1, Name = "John Doe" }),
+            Data = Result<object, string>.Ok(new { Id = 1, Name = "John Doe" }),
             Timestamp = DateTime.UtcNow
         };
 
@@ -274,8 +303,10 @@ public class JsonConvertersTests
     #endregion
 }
 
-public class User
+
+public class OptionContainer
 {
-    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public Option<string> Email { get; set; } = new Option<string>.None();
 }
+

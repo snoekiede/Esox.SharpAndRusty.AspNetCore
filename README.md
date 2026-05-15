@@ -1,7 +1,7 @@
 # Esox.SharpAndRusty.AspNetCore
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
-[![Tests](https://img.shields.io/badge/tests-564%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
+[![Tests](https://img.shields.io/badge/tests-570%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![.NET](https://img.shields.io/badge/.NET-8%20%7C%209%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 
@@ -16,7 +16,7 @@ ASP.NET Core integration for **Esox.SharpAndRusty** functional types (`Option`, 
 - ✅ **Automatic Status Codes** - ErrorKind automatically maps to appropriate HTTP status codes
 - ✅ **Validation Integration** - `Validation<T, E>` converts to ValidationProblemDetails
 - ✅ **JSON Serialization** - Clean serialization of `Option<T>`, `Result<T,E>`, and `ExtendedResult<T,E>` in API responses
-- ✅ **Comprehensive Testing** - 564 unit tests with 100% coverage across .NET 8, 9, and 10
+- ✅ **Comprehensive Testing** - 570 total test executions in the latest verified run; all 570 passing across .NET 8, 9, and 10
 
 ## Why Use This Library?
 
@@ -908,7 +908,7 @@ app.UseResultMiddleware(new ResultMiddlewareOptions
 
 ## Testing
 
-The AspNetCore library comes with **173 comprehensive unit tests** covering all functionality:
+The AspNetCore library currently reports **570 total test executions** across .NET 8, 9, and 10 in the latest verified run:
 
 ### Test Coverage
 - ✅ **Action Result Conversions** (38 tests) - All conversion methods and edge cases
@@ -982,7 +982,7 @@ public void OptionModelBinder_WithMissingValue_BindsToNone()
 }
 ```
 
-For complete test coverage details, see [TEST_COVERAGE.md](../../Esox.SharpAndRust.Tests/AspNetCore/TEST_COVERAGE.md).
+For complete test coverage details, see [TEST_DOCUMENTATION.md](Esox.SharpAndRusty.AspNetCore.Tests/TEST_DOCUMENTATION.md).
 
 ---
 
@@ -1015,7 +1015,7 @@ This change provides:
 | Metric | Status |
 |--------|--------|
 | Build | ✅ Passing |
-| Tests | ✅ 513/513 passing |
+| Tests | ✅ 570/570 passing |
 | Vulnerabilities | ✅ 0 found |
 | Target Frameworks | .NET 8.0, 9.0, 10.0 |
 | Code Coverage | 100% |
@@ -1101,7 +1101,7 @@ This project uses [Semantic Versioning](https://semver.org/):
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
 ---
 

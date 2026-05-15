@@ -12,16 +12,15 @@ public class OptionJsonConverterFactory : JsonConverterFactory
 {
     public override bool CanConvert(Type typeToConvert)
     {
-        if (typeToConvert.IsGenericType)
-        {
-            var genericType = typeToConvert.GetGenericTypeDefinition();
-            // Handle Option<T>.Some and Option<T>.None
-            if (genericType == typeof(Option<>.Some) || genericType == typeof(Option<>.None))
-            {
-                return true;
-            }
-        }
-        return false;
+        if (!typeToConvert.IsGenericType)
+            return false;
+
+        var genericType = typeToConvert.GetGenericTypeDefinition();
+
+        // Handle Option<T> directly as well as Option<T>.Some and Option<T>.None
+        return genericType == typeof(Option<>)
+            || genericType == typeof(Option<>.Some)
+            || genericType == typeof(Option<>.None);
     }
 
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
@@ -74,22 +73,13 @@ public class ExtendedResultJsonConverterFactory : JsonConverterFactory
     }
 }
 
-/// <summary>
-/// JSON converter for Option<T> types.
-/// Serializes Some(value) as the value itself, None as null.
-/// </summary>
+// JSON converter for Option{T} types.
+// Serializes Some(value) as the value itself, None as null.
 public class OptionJsonConverter<T> : JsonConverter<object>
 {
-    public override bool CanConvert(Type typeToConvert)
-    {
-        if (!typeToConvert.IsGenericType)
-            return false;
+    public override bool HandleNull => true;
 
-        var genericType = typeToConvert.GetGenericTypeDefinition();
-        return genericType == typeof(Option<>.Some) || genericType == typeof(Option<>.None);
-    }
-
-    public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // For deserialization, null -> None, value -> Some(value)
         if (reader.TokenType == JsonTokenType.Null)
@@ -127,20 +117,18 @@ public class OptionJsonConverter<T> : JsonConverter<object>
     }
 }
 
-/// <summary>
-/// JSON converter for Result<T, E> types.
-/// Serializes Ok(value) as the value itself, Err(error) throws an exception.
-/// </summary>
-public class ResultJsonConverter<T, E> : JsonConverter<Result<T, E>>
+// JSON converter for Result{T, TE} types.
+// Serializes Ok(value) as the value itself, Err(error) throws an exception.
+public class ResultJsonConverter<T, TE> : JsonConverter<Result<T, TE>>
 {
-    public override Result<T, E> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Result<T, TE> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // For deserialization, assume it's always an Ok value
         var value = JsonSerializer.Deserialize<T>(ref reader, options);
-        return Result<T, E>.Ok(value!);
+        return Result<T, TE>.Ok(value!);
     }
 
-    public override void Write(Utf8JsonWriter writer, Result<T, E> value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Result<T, TE> value, JsonSerializerOptions options)
     {
         value.Match<IActionResult>(
             success: val => 
@@ -153,20 +141,18 @@ public class ResultJsonConverter<T, E> : JsonConverter<Result<T, E>>
     }
 }
 
-/// <summary>
-/// JSON converter for ExtendedResult<T, E> types.
-/// Serializes Ok(value) as the value itself, Err(error) throws an exception.
-/// </summary>
-public class ExtendedResultJsonConverter<T, E> : JsonConverter<ExtendedResult<T, E>>
+// JSON converter for ExtendedResult{T, TE} types.
+// Serializes Ok(value) as the value itself, Err(error) throws an exception.
+public class ExtendedResultJsonConverter<T, TE> : JsonConverter<ExtendedResult<T, TE>>
 {
-    public override ExtendedResult<T, E> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override ExtendedResult<T, TE> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // For deserialization, assume it's always an Ok value
         var value = JsonSerializer.Deserialize<T>(ref reader, options);
-        return ExtendedResult<T, E>.Ok(value!);
+        return ExtendedResult<T, TE>.Ok(value!);
     }
 
-    public override void Write(Utf8JsonWriter writer, ExtendedResult<T, E> value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, ExtendedResult<T, TE> value, JsonSerializerOptions options)
     {
         value.Match<IActionResult>(
             success: val => 

@@ -1,12 +1,12 @@
 # Comprehensive Test Suite for Esox.SharpAndRusty.AspNetCore
 
-✅ **Current Status: All 564 tests passing on .NET 8, 9, and 10**
+✅ **Current Status: 570 total test executions; all 570 passing on .NET 8, 9, and 10**
 
 This document outlines the comprehensive unit tests for the Esox.SharpAndRusty.AspNetCore library.
 
 ## Test Coverage Summary
 
-The test suite includes **564 unit tests** covering all major components with 100% pass rate:
+The test suite includes **570 total test executions** across the supported target frameworks in the latest verified run.
 
 ### 1. ActionResultExtensionsTests (40+ tests)
 Tests for converting functional types to ASP.NET Core `IActionResult`:
@@ -301,13 +301,13 @@ dotnet test --framework net10.0
 
 ## Test Results
 
-**Last Test Run:**
-- **Total Tests:** 513
-- **Passed:** 513 ✅
+- **Last Test Run:**
+- **Total Tests:** 570
+- **Passed:** 570 ✅
 - **Failed:** 0
 - **Skipped:** 0
 - **Frameworks:** .NET 8.0, 9.0, 10.0
-- **Duration:** ~275ms
+- **Duration:** latest verified run completed successfully with all tests passing
 
 ## Code Coverage
 

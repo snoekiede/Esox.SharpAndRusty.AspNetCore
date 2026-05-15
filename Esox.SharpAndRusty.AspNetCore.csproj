@@ -16,7 +16,9 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore</PackageProjectUrl>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
+    <Title>Sharp and Rusty AspNet Core extensions</Title>
+    <Description>Sharp and Rusty AspNet Core extensions</Description>
   </PropertyGroup>
 
   <ItemGroup>
