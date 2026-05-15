@@ -42,6 +42,26 @@ public static class ServiceCollectionExtensions
             }
         });
 
+        // Configure JSON converters for System.Text.Json
+        if (options.EnableJsonConverters)
+        {
+            services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(jsonOptions =>
+            {
+                // Add converters for functional types
+                jsonOptions.JsonSerializerOptions.Converters.Add(new OptionJsonConverterFactory());
+                jsonOptions.JsonSerializerOptions.Converters.Add(new ResultJsonConverterFactory());
+                jsonOptions.JsonSerializerOptions.Converters.Add(new ExtendedResultJsonConverterFactory());
+            });
+
+            // Also configure for minimal APIs and other JSON serialization
+            services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
+            {
+                jsonOptions.SerializerOptions.Converters.Add(new OptionJsonConverterFactory());
+                jsonOptions.SerializerOptions.Converters.Add(new ResultJsonConverterFactory());
+                jsonOptions.SerializerOptions.Converters.Add(new ExtendedResultJsonConverterFactory());
+            });
+        }
+
         return services;
     }
 
@@ -104,4 +124,10 @@ public class SharpAndRustyOptions
     /// Results are typically returned, not received as input.
     /// </summary>
     public bool EnableResultModelBinding { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets whether to enable JSON converters for functional types (default: true).
+    /// This enables proper serialization of Option{T}, Result{T, E}, and ExtendedResult{T, E}.
+    /// </summary>
+    public bool EnableJsonConverters { get; set; } = true;
 }
