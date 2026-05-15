@@ -10,7 +10,7 @@
 ### 1. ✅ README.md
 **Changes:**
 - Added status badges (Build, Tests, Security, .NET versions)
-- Updated test count from 173 to **411 tests**
+- Updated test count from 173 to **564 tests**
 - Added "Recent Updates" section documenting security fixes
 - Added "Project Status" table with current metrics
 - Added comprehensive "Contributing" section

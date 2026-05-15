@@ -1,12 +1,12 @@
 # Comprehensive Test Suite for Esox.SharpAndRusty.AspNetCore
 
-✅ **Current Status: All 513 tests passing on .NET 8, 9, and 10**
+✅ **Current Status: All 564 tests passing on .NET 8, 9, and 10**
 
 This document outlines the comprehensive unit tests for the Esox.SharpAndRusty.AspNetCore library.
 
 ## Test Coverage Summary
 
-The test suite includes **513 unit tests** covering all major components with 100% pass rate:
+The test suite includes **564 unit tests** covering all major components with 100% pass rate:
 
 ### 1. ActionResultExtensionsTests (40+ tests)
 Tests for converting functional types to ASP.NET Core `IActionResult`:
@@ -166,7 +166,40 @@ Tests for global exception handling middleware:
 - `Production()` static factory (excludes sensitive info, adds request ID metadata)
 - Custom metadata provider functionality
 
-### 6. ServiceCollectionExtensionsTests (20+ tests)
+### 6. JsonConvertersTests (24 tests)
+Tests for JSON serialization of functional types:
+
+#### Option<T> Serialization Tests (8 tests)
+- `Option_Some_SerializesToValue()` - Some(value) serializes as the value itself
+- `Option_None_SerializesToNull()` - None serializes as null
+- `Option_Some_Int_SerializesCorrectly()` - Int values serialize properly
+- `Option_None_Int_SerializesToNull()` - Int None serializes as null
+- `Option_Some_Object_SerializesCorrectly()` - Complex objects serialize correctly
+- `Option_Deserialize_Null_To_None()` - Deserialization of null to None
+- `Option_Deserialize_Value_To_Some()` - Deserialization of values to Some
+- Complex object with Option serialization
+
+#### Result<T, E> Serialization Tests (6 tests)
+- `Result_Ok_SerializesToValue()` - Ok(value) serializes as the value itself
+- `Result_Err_ThrowsJsonException()` - Err throws exception on serialization
+- `Result_Ok_Int_SerializesCorrectly()` - Int values serialize properly
+- `Result_Deserialize_Value_To_Ok()` - Deserialization creates Ok result
+- Complex object with Result serialization
+
+#### ExtendedResult<T, E> Serialization Tests (6 tests)
+- `ExtendedResult_Ok_SerializesToValue()` - Ok(value) serializes as the value itself
+- `ExtendedResult_Err_ThrowsJsonException()` - Err throws exception on serialization
+- `ExtendedResult_Ok_Object_SerializesCorrectly()` - Complex objects serialize correctly
+- `ExtendedResult_Deserialize_Value_To_Ok()` - Deserialization creates Ok result
+- Complex object with ExtendedResult serialization
+
+#### Integration Tests (4 tests)
+- Complex objects with multiple functional types
+- API response patterns with Result data
+- Serialization behavior verification
+- Type safety and correctness
+
+### 7. ServiceCollectionExtensionsTests (20+ tests)
 Tests for service registration and middleware configuration:
 
 #### Service Collection Extensions

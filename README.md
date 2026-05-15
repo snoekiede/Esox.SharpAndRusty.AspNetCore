@@ -1,7 +1,7 @@
 # Esox.SharpAndRusty.AspNetCore
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
-[![Tests](https://img.shields.io/badge/tests-513%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
+[![Tests](https://img.shields.io/badge/tests-564%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![.NET](https://img.shields.io/badge/.NET-8%20%7C%209%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 
@@ -15,7 +15,8 @@ ASP.NET Core integration for **Esox.SharpAndRusty** functional types (`Option`, 
 - ✅ **Global Error Handling** - Middleware for catching exceptions and converting to ProblemDetails
 - ✅ **Automatic Status Codes** - ErrorKind automatically maps to appropriate HTTP status codes
 - ✅ **Validation Integration** - `Validation<T, E>` converts to ValidationProblemDetails
-- ✅ **Comprehensive Testing** - 513 unit tests with 100% coverage across .NET 8, 9, and 10
+- ✅ **JSON Serialization** - Clean serialization of `Option<T>`, `Result<T,E>`, and `ExtendedResult<T,E>` in API responses
+- ✅ **Comprehensive Testing** - 564 unit tests with 100% coverage across .NET 8, 9, and 10
 
 ## Why Use This Library?
 
@@ -107,6 +108,72 @@ public class UsersController : ControllerBase
     }
 }
 ```
+
+---
+
+## JSON Serialization
+
+When returning functional types directly from API endpoints, they serialize cleanly to JSON:
+
+### Option<T> Serialization
+
+```csharp
+[HttpGet("user/{id}")]
+public Option<User> GetUser(int id)
+{
+    return FindUser(id); // Option<User>
+}
+
+// Response when user exists:
+// {
+//   "id": 123,
+//   "name": "John Doe",
+//   "email": "john@example.com"
+// }
+
+// Response when user doesn't exist:
+// null
+```
+
+### Result<T, E> Serialization
+
+```csharp
+[HttpPost("user")]
+public Result<User, Error> CreateUser([FromBody] CreateUserDto dto)
+{
+    return ValidateAndCreateUser(dto); // Result<User, Error>
+}
+
+// Success response:
+// {
+//   "id": 123,
+//   "name": "John Doe",
+//   "email": "john@example.com"
+// }
+
+// Error response: Throws JsonException (results should typically be converted to IActionResult)
+```
+
+### ExtendedResult<T, E> Serialization
+
+```csharp
+[HttpGet("user/{id}/details")]
+public ExtendedResult<UserDetails, Error> GetUserDetails(int id)
+{
+    return GetDetailedUserInfo(id); // ExtendedResult<UserDetails, Error>
+}
+
+// Success response:
+// {
+//   "user": { "id": 123, "name": "John Doe" },
+//   "permissions": ["read", "write"],
+//   "lastLogin": "2023-12-01T10:30:00Z"
+// }
+
+// Error response: Throws JsonException (extended results should typically be converted to IActionResult)
+```
+
+**Note:** `Result<T,E>` and `ExtendedResult<T,E>` in error states cannot be serialized and will throw `JsonException`. For API responses, convert them to `IActionResult` using `.ToActionResult()` instead.
 
 ---
 
