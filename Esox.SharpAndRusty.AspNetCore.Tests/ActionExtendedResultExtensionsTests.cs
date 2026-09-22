@@ -1,4 +1,3 @@
-using Esox.SharpAndRusty.AspNetCore;
 using Esox.SharpAndRusty.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -290,7 +289,7 @@ public class ActionExtendedResultExtensionsTests
         dynamic? resultValue = okResult.Value;
         Assert.NotNull(resultValue);
         Assert.Equal("success", resultValue!.data);
-        Assert.True(resultValue!.custom);
+        Assert.True(resultValue.custom);
     }
 
     [Fact]
@@ -316,7 +315,7 @@ public class ActionExtendedResultExtensionsTests
         dynamic? resultValue = badRequestResult.Value;
         Assert.NotNull(resultValue);
         Assert.Equal("error", resultValue!.error);
-        Assert.True(resultValue!.custom);
+        Assert.True(resultValue.custom);
     }
 
     [Fact]
@@ -493,7 +492,7 @@ public class ActionExtendedResultExtensionsTests
         // Act
         var actionResult1 = result.ToActionResult();
         var actionResult2 = result.ToCreatedResult(x => $"/api/items/{x}");
-        var actionResult3 = result.ToAcceptedResult($"/api/jobs/42");
+        var actionResult3 = result.ToAcceptedResult("/api/jobs/42");
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(actionResult1);

@@ -3,7 +3,6 @@ using Esox.SharpAndRusty.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 namespace Esox.SharpAndRusty.AspNetCore.Tests.ModelBinding;
 
@@ -77,6 +76,22 @@ public class OptionModelBinderTests
         // Assert
         Assert.True(context.Result.IsModelSet);
         Assert.IsType<Option<string>.None>(context.Result.Model);
+    }
+
+    [Fact]
+    public async Task BindModelAsync_WhenInnerBinderAddsModelStateError_PreservesFailure()
+    {
+        // Arrange
+        var innerBinder = new TestModelBinder(null, fail: true, error: "The value is invalid.");
+        var binder = new OptionModelBinder(innerBinder);
+        var context = CreateModelBindingContext<Option<int>>();
+
+        // Act
+        await binder.BindModelAsync(context);
+
+        // Assert
+        Assert.False(context.Result.IsModelSet);
+        Assert.True(context.ModelState.ErrorCount > 0);
     }
 
     [Fact]
@@ -159,35 +174,24 @@ public class OptionModelBinderTests
         return bindingContext;
     }
 
-    private class TestModelBinder : IModelBinder
+    private class TestModelBinder(object? value, bool fail = false, string? error = null) : IModelBinder
     {
-        private readonly object? _value;
-        private readonly bool _fail;
-
-        public TestModelBinder(object? value, bool fail = false)
-        {
-            _value = value;
-            _fail = fail;
-        }
-
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (_fail)
+            if (error is not null)
             {
-                bindingContext.Result = ModelBindingResult.Failed();
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, error);
             }
-            else
-            {
-                bindingContext.Result = ModelBindingResult.Success(_value);
-            }
+
+            bindingContext.Result = fail ? ModelBindingResult.Failed() : ModelBindingResult.Success(value);
             return Task.CompletedTask;
         }
     }
 
     private class Person
     {
-        public string Name { get; set; } = string.Empty;
-        public int Age { get; set; }
+        public string Name { get; init; } = string.Empty;
+        public int Age { get; init; }
     }
 
     #endregion
@@ -354,8 +358,8 @@ public class OptionModelBinderProviderTests
 
     private class Person
     {
-        public string Name { get; set; } = string.Empty;
-        public int Age { get; set; }
+        public string Name { get; init; } = string.Empty;
+        public int Age { get; init; }
     }
 
     #endregion

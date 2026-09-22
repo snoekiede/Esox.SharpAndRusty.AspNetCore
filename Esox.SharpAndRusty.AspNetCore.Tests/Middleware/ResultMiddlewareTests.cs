@@ -35,11 +35,11 @@ public class ResultMiddlewareTests
     public void Constructor_WithNullOptions_DoesNotThrow()
     {
         // Arrange
-        RequestDelegate next = _ => Task.CompletedTask;
+        Task Next(HttpContext _) => Task.CompletedTask;
         var logger = NullLogger<ResultMiddleware>.Instance;
 
         // Act
-        var middleware = new ResultMiddleware(next, logger, null);
+        var middleware = new ResultMiddleware(Next, logger);
 
         // Assert
         Assert.NotNull(middleware);
@@ -49,12 +49,12 @@ public class ResultMiddlewareTests
     public void Constructor_WithValidParameters_CreatesInstance()
     {
         // Arrange
-        RequestDelegate next = _ => Task.CompletedTask;
+        Task Next(HttpContext _) => Task.CompletedTask;
         var logger = NullLogger<ResultMiddleware>.Instance;
         var options = new ResultMiddlewareOptions();
 
         // Act
-        var middleware = new ResultMiddleware(next, logger, options);
+        var middleware = new ResultMiddleware(Next, logger, options);
 
         // Assert
         Assert.NotNull(middleware);
@@ -69,9 +69,15 @@ public class ResultMiddlewareTests
     {
         // Arrange
         var nextCalled = false;
-        RequestDelegate next = _ => { nextCalled = true; return Task.CompletedTask; };
+
+        Task Next(HttpContext _)
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        }
+
         var logger = NullLogger<ResultMiddleware>.Instance;
-        var middleware = new ResultMiddleware(next, logger);
+        var middleware = new ResultMiddleware(Next, logger);
         var context = new DefaultHttpContext();
 
         // Act
@@ -85,11 +91,16 @@ public class ResultMiddlewareTests
     public async Task InvokeAsync_WhenExceptionThrown_HandlesException()
     {
         // Arrange
-        RequestDelegate next = _ => throw new InvalidOperationException("Test error");
+        Task Next(HttpContext _) => throw new InvalidOperationException("Test error");
         var logger = new TestLogger<ResultMiddleware>();
-        var middleware = new ResultMiddleware(next, logger);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+        var middleware = new ResultMiddleware(Next, logger);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
 
         // Act
         await middleware.InvokeAsync(context);
@@ -104,11 +115,16 @@ public class ResultMiddlewareTests
     public async Task InvokeAsync_WhenExceptionHandled_WritesProblemDetailsResponse()
     {
         // Arrange
-        RequestDelegate next = _ => throw new InvalidOperationException("Test error");
+        Task Next(HttpContext _) => throw new InvalidOperationException("Test error");
         var logger = NullLogger<ResultMiddleware>.Instance;
-        var middleware = new ResultMiddleware(next, logger);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+        var middleware = new ResultMiddleware(Next, logger);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
 
         // Act
         await middleware.InvokeAsync(context);
@@ -128,15 +144,46 @@ public class ResultMiddlewareTests
     }
 
     [Fact]
+    public async Task InvokeAsync_WithProductionDefaults_DoesNotExposeExceptionDetails()
+    {
+        // Arrange
+        const string secret = "database-password-should-not-leak";
+        Task Next(HttpContext _) => throw new InvalidOperationException(secret);
+        var logger = NullLogger<ResultMiddleware>.Instance;
+        var middleware = new ResultMiddleware(Next, logger, ResultMiddlewareOptions.Production());
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
+
+        // Act
+        await middleware.InvokeAsync(context);
+
+        // Assert
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        Assert.DoesNotContain(secret, responseBody, StringComparison.Ordinal);
+        Assert.DoesNotContain("StackTrace", responseBody, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task InvokeAsync_WithWriteIndented_WritesFormattedJson()
     {
         // Arrange
-        RequestDelegate next = _ => throw new InvalidOperationException("Test error");
+        Task Next(HttpContext _) => throw new InvalidOperationException("Test error");
         var logger = NullLogger<ResultMiddleware>.Instance;
         var options = new ResultMiddlewareOptions { WriteIndented = true };
-        var middleware = new ResultMiddleware(next, logger, options);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+        var middleware = new ResultMiddleware(Next, logger, options);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
 
         // Act
         await middleware.InvokeAsync(context);
@@ -153,13 +200,19 @@ public class ResultMiddlewareTests
     {
         // Arrange
         var exceptionThrown = false;
-        RequestDelegate next = _ => { exceptionThrown = true; throw new ArgumentException("Test error"); };
+
+        Task Next(HttpContext _)
+        {
+            exceptionThrown = true;
+            throw new ArgumentException("Test error");
+        }
+
         var logger = NullLogger<ResultMiddleware>.Instance;
         var options = new ResultMiddlewareOptions
         {
             HandleException = ex => ex is InvalidOperationException
         };
-        var middleware = new ResultMiddleware(next, logger, options);
+        var middleware = new ResultMiddleware(Next, logger, options);
         var context = new DefaultHttpContext();
 
         // Act & Assert
@@ -171,12 +224,17 @@ public class ResultMiddlewareTests
     public async Task InvokeAsync_AddsTraceIdToResponse()
     {
         // Arrange
-        RequestDelegate next = _ => throw new InvalidOperationException("Test error");
+        Task Next(HttpContext _) => throw new InvalidOperationException("Test error");
         var logger = NullLogger<ResultMiddleware>.Instance;
-        var middleware = new ResultMiddleware(next, logger);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
-        context.TraceIdentifier = "test-trace-id";
+        var middleware = new ResultMiddleware(Next, logger);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            },
+            TraceIdentifier = "test-trace-id"
+        };
 
         // Act
         await middleware.InvokeAsync(context);
@@ -189,12 +247,20 @@ public class ResultMiddlewareTests
     public async Task InvokeAsync_AddsRequestPathToResponse()
     {
         // Arrange
-        RequestDelegate next = _ => throw new InvalidOperationException("Test error");
+        Task Next(HttpContext _) => throw new InvalidOperationException("Test error");
         var logger = NullLogger<ResultMiddleware>.Instance;
-        var middleware = new ResultMiddleware(next, logger);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
-        context.Request.Path = "/api/test";
+        var middleware = new ResultMiddleware(Next, logger);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            },
+            Request =
+            {
+                Path = "/api/test"
+            }
+        };
 
         // Act
         await middleware.InvokeAsync(context);
@@ -209,11 +275,16 @@ public class ResultMiddlewareTests
     public async Task InvokeAsync_WithNotSupportedException_Maps501()
     {
         // Arrange
-        RequestDelegate next = _ => throw new NotSupportedException("Not supported");
+        Task Next(HttpContext _) => throw new NotSupportedException("Not supported");
         var logger = NullLogger<ResultMiddleware>.Instance;
-        var middleware = new ResultMiddleware(next, logger);
-        var context = new DefaultHttpContext();
-        context.Response.Body = new MemoryStream();
+        var middleware = new ResultMiddleware(Next, logger);
+        var context = new DefaultHttpContext
+        {
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
 
         // Act
         await middleware.InvokeAsync(context);

@@ -1,8 +1,6 @@
-﻿using Esox.SharpAndRusty.Types;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Error = Esox.SharpAndRusty.Types.Error;
 
 namespace Esox.SharpAndRusty.AspNetCore.Middleware;
@@ -48,7 +46,9 @@ public class ResultMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var error = Error.FromException(exception);
+        var error = _options.IncludeExceptionDetails
+            ? Error.FromException(exception)
+            : Error.New("An unexpected error occurred.", Esox.SharpAndRusty.Types.ErrorKind.Other);
 
         if (_options.IncludeStackTrace && error.StackTrace == null)
         {
@@ -93,6 +93,12 @@ public class ResultMiddlewareOptions
     public bool IncludeStackTrace { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets whether exception messages are included in error responses (default: true).
+    /// Disable this in production to avoid exposing sensitive exception details.
+    /// </summary>
+    public bool IncludeExceptionDetails { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets whether to include file information in stack traces (default: false).
     /// </summary>
     public bool IncludeFileInfo { get; set; } = false;
@@ -117,6 +123,7 @@ public class ResultMiddlewareOptions
     /// </summary>
     public static ResultMiddlewareOptions Development() => new()
     {
+        IncludeExceptionDetails = true,
         IncludeStackTrace = true,
         IncludeFileInfo = true,
         WriteIndented = true
@@ -127,6 +134,7 @@ public class ResultMiddlewareOptions
     /// </summary>
     public static ResultMiddlewareOptions Production() => new()
     {
+        IncludeExceptionDetails = false,
         IncludeStackTrace = false,
         IncludeFileInfo = false,
         WriteIndented = false,

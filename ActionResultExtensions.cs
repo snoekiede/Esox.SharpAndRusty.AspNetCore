@@ -240,7 +240,7 @@ public static class ActionResultExtensions
     {
         return validation.Match<IActionResult>(
             onSuccess: value => new OkObjectResult(value),
-            onFailure: errors => new BadRequestObjectResult(new { errors = errors })
+            onFailure: errors => new BadRequestObjectResult(new { errors })
         );
     }
 

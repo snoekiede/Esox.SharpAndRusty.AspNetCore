@@ -51,9 +51,22 @@ public class OptionModelBinder : IModelBinder
 
             bindingContext.Result = ModelBindingResult.Success(someInstance);
         }
+        else if (innerContext.ModelState.ErrorCount > 0)
+        {
+            // Preserve validation and conversion errors from the inner binder.
+            foreach (var modelState in innerContext.ModelState)
+            {
+                foreach (var error in modelState.Value.Errors)
+                {
+                    bindingContext.ModelState.AddModelError(modelState.Key, error.ErrorMessage);
+                }
+            }
+
+            bindingContext.Result = ModelBindingResult.Failed();
+        }
         else
         {
-            // Value was not bound (missing, null, or validation error) - create None
+            // Value was not provided - create None.
             var valueType = bindingContext.ModelMetadata.ModelType.GetGenericArguments()[0];
 
             // Create None instance

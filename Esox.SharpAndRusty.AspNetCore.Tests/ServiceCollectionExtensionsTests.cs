@@ -1,4 +1,3 @@
-using Esox.SharpAndRusty.AspNetCore;
 using Esox.SharpAndRusty.AspNetCore.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -122,6 +121,36 @@ public class ServiceCollectionExtensionsTests
         Assert.Same(appBuilder, result);
     }
 
+    [Fact]
+    public async Task UseResultMiddlewareProduction_IntegratesWithRequestPipeline()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var serviceProvider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(serviceProvider)
+            .UseResultMiddlewareProduction()
+            .Use(_ => _ => throw new InvalidOperationException("sensitive failure"))
+            .Build();
+        var context = new DefaultHttpContext
+        {
+            RequestServices = serviceProvider,
+            Response =
+            {
+                Body = new MemoryStream()
+            }
+        };
+
+        // Act
+        await app(context);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status500InternalServerError, context.Response.StatusCode);
+        context.Response.Body.Seek(0, SeekOrigin.Begin);
+        var responseBody = await new StreamReader(context.Response.Body).ReadToEndAsync();
+        Assert.DoesNotContain("sensitive failure", responseBody, StringComparison.Ordinal);
+    }
+
     #endregion
 
     #region UseResultMiddlewareDevelopment Tests
@@ -227,7 +256,7 @@ public class ServiceCollectionExtensionsTests
         {
             ApplicationServices = serviceProvider;
             Properties = new Dictionary<string, object?>();
-            ServerFeatures = new Microsoft.AspNetCore.Http.Features.FeatureCollection();
+            ServerFeatures = new FeatureCollection();
         }
 
         public bool MiddlewareAdded => _components.Count > 0;

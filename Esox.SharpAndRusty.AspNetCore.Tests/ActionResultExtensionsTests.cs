@@ -1,4 +1,3 @@
-using Esox.SharpAndRusty.AspNetCore;
 using Esox.SharpAndRusty.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -394,7 +393,7 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToActionResult_ReturnsBadRequestWithErrors()
     {
         // Arrange
-        var validation = Validation<string, string>.Invalid(new[] { "error1", "error2" });
+        var validation = Validation<string, string>.Invalid(["error1", "error2"]);
 
         // Act
         var actionResult = validation.ToActionResult();
@@ -411,7 +410,7 @@ public class ActionResultExtensionsTests
         // Arrange
         var error1 = Error.New("Field1 invalid", ErrorKind.InvalidInput);
         var error2 = Error.New("Field2 invalid", ErrorKind.InvalidInput);
-        var validation = Validation<string, Error>.Invalid(new[] { error1, error2 });
+        var validation = Validation<string, Error>.Invalid([error1, error2]);
 
         // Act
         var actionResult = validation.ToActionResult();
@@ -432,7 +431,7 @@ public class ActionResultExtensionsTests
 
         // Act
         var actionResult = validation.ToValidationResult(
-            e => "field",
+            _ => "field",
             e => e
         );
 
@@ -444,11 +443,11 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToValidationResult_ReturnsValidationProblemDetails()
     {
         // Arrange
-        var validation = Validation<object, string>.Invalid(new[] { "error1", "error2" });
+        var validation = Validation<object, string>.Invalid(["error1", "error2"]);
 
         // Act
         var actionResult = validation.ToValidationResult(
-            e => "field",
+            _ => "field",
             e => e
         );
 
@@ -463,12 +462,11 @@ public class ActionResultExtensionsTests
     public void Validation_Invalid_ToValidationResult_GroupsByKey()
     {
         // Arrange
-        var validation = Validation<object, (string field, string message)>.Invalid(new[]
-        {
+        var validation = Validation<object, (string field, string message)>.Invalid([
             ("email", "Invalid email"),
             ("password", "Too short"),
             ("email", "Already exists")
-        });
+        ]);
 
         // Act
         var actionResult = validation.ToValidationResult(
@@ -525,8 +523,8 @@ public class ActionResultExtensionsTests
 
     private class Person
     {
-        public string Name { get; set; } = string.Empty;
-        public int Age { get; set; }
+        public string Name { get; init; } = string.Empty;
+        public int Age { get; init; }
     }
 
     #endregion
