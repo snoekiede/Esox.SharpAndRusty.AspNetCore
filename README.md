@@ -1,7 +1,7 @@
 # Esox.SharpAndRusty.AspNetCore
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
-[![Tests](https://img.shields.io/badge/tests-570%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
+[![Tests](https://img.shields.io/badge/tests-579%20passing-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](https://github.com/snoekiede/Esox.SharpAndRusty.AspNetCore)
 [![.NET](https://img.shields.io/badge/.NET-8%20%7C%209%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 
@@ -16,7 +16,7 @@ ASP.NET Core integration for **Esox.SharpAndRusty** functional types (`Option`, 
 - ✅ **Automatic Status Codes** - ErrorKind automatically maps to appropriate HTTP status codes
 - ✅ **Validation Integration** - `Validation<T, E>` converts to ValidationProblemDetails
 - ✅ **JSON Serialization** - Clean serialization of `Option<T>`, `Result<T,E>`, and `ExtendedResult<T,E>` in API responses
-- ✅ **Comprehensive Testing** - 570 total test executions in the latest verified run; all 570 passing across .NET 8, 9, and 10
+- ✅ **Comprehensive Testing** - 579 total test executions in the latest verified run; all 579 passing across .NET 8, 9, and 10
 
 ## Why Use This Library?
 
@@ -60,7 +60,7 @@ public IActionResult Search(string query, Option<int> page, Option<string> sortB
 ### 🛡️ Production-Ready Error Handling
 - RFC 7807 ProblemDetails format
 - Automatic status code mapping
-- Stack traces in development, clean responses in production
+- Stack traces and exception details in development; sanitized responses in production
 - Request correlation and tracing
 - Type-safe error handling throughout your application
 
@@ -480,7 +480,7 @@ app.UseResultMiddleware(new ResultMiddlewareOptions
 
 ### Option<T> Binding
 
-The library provides automatic model binding for `Option<T>`, treating missing/null values as `None` instead of validation errors:
+The library provides automatic model binding for `Option<T>`, treating missing values as `None` instead of validation errors. Invalid values preserve the inner binder's model-state errors so malformed input is not silently accepted:
 
 ```csharp
 [HttpGet]
@@ -908,7 +908,7 @@ app.UseResultMiddleware(new ResultMiddlewareOptions
 
 ## Testing
 
-The AspNetCore library currently reports **570 total test executions** across .NET 8, 9, and 10 in the latest verified run:
+The AspNetCore library currently reports **579 total test executions** across .NET 8, 9, and 10 in the latest verified run:
 
 ### Test Coverage
 - ✅ **Action Result Conversions** (38 tests) - All conversion methods and edge cases
@@ -988,7 +988,7 @@ For complete test coverage details, see [TEST_DOCUMENTATION.md](Esox.SharpAndRus
 
 ## Recent Updates
 
-### ✅ Security Update (Latest)
+### ✅ Security Update
 **Fixed:** Vulnerable Microsoft.AspNetCore package dependencies (CVE-2018-8269 and others)
 
 **Action Taken:**
@@ -1015,10 +1015,10 @@ This change provides:
 | Metric | Status |
 |--------|--------|
 | Build | ✅ Passing |
-| Tests | ✅ 570/570 passing |
+| Tests | ✅ 579/579 passing |
 | Vulnerabilities | ✅ 0 found |
 | Target Frameworks | .NET 8.0, 9.0, 10.0 |
-| Code Coverage | 100% |
+| Code Coverage | Covered by the test suite; generate reports with `coverlet` |
 | Documentation | Complete |
 
 ---
@@ -1045,7 +1045,7 @@ dotnet test
 
 ### Development Guidelines
 1. **Write tests first** - Follow TDD principles
-2. **Maintain 100% coverage** - All public APIs must be tested
+2. **Maintain thorough coverage** - Add tests for public APIs and important integration paths
 3. **Follow existing patterns** - Use the AAA pattern (Arrange-Act-Assert)
 4. **Test all frameworks** - Ensure compatibility with .NET 8, 9, and 10
 5. **Update documentation** - Keep README and docs in sync with code changes
